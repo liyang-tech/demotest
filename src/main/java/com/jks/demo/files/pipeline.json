@@ -1,0 +1,157 @@
+{
+  "agent": {
+    "type": "any"
+  },
+  "post": {
+    "conditions": [{
+      "condition": "success",
+      "branch": {
+        "name": "default",
+        "steps": [{
+          "name": "script",
+          "arguments": [{
+            "value": {
+              "isLiteral": true,
+              "value": "try { \nreqBody='{\"flowJobId\":\"a3a1bb8ee05e4946a9c09180afb254cf\",\"id\":\"'+\"${env.BUILD_ID}\"+'\",\"flowJobTaskState\":\"SUCCESS\"}'\ndef response1 = httpRequest contentType: 'APPLICATION_JSON',httpMode: 'POST',url: 'http://10.51.30.77:8001/application/v1/flowJob/notification',requestBody:reqBody\nprintln response1.status \nprintln response1.content\n}catch (Exception e) {\nprintln e.message\n}"
+            },
+            "key": "scriptBlock"
+          }]
+        }]
+      }
+    }, {
+      "condition": "failure",
+      "branch": {
+        "name": "default",
+        "steps": [{
+          "name": "script",
+          "arguments": [{
+            "value": {
+              "isLiteral": true,
+              "value": "try { \nreqBody='{\"flowJobId\":\"a3a1bb8ee05e4946a9c09180afb254cf\",\"id\":\"'+\"${env.BUILD_ID}\"+'\",\"flowJobTaskState\":\"FAILURE\"}'\ndef response1 = httpRequest contentType: 'APPLICATION_JSON',httpMode: 'POST',url: 'http://10.51.30.77:8001/application/v1/flowJob/notification',requestBody:reqBody\nprintln response1.status \nprintln response1.content\n}catch (Exception e) {\nprintln e.message\n}"
+            },
+            "key": "scriptBlock"
+          }]
+        }]
+      }
+    }, {
+      "condition": "aborted",
+      "branch": {
+        "name": "default",
+        "steps": [{
+          "name": "script",
+          "arguments": [{
+            "value": {
+              "isLiteral": true,
+              "value": "try { \nreqBody='{\"flowJobId\":\"a3a1bb8ee05e4946a9c09180afb254cf\",\"id\":\"'+\"${env.BUILD_ID}\"+'\",\"flowJobTaskState\":\"ABORTED\"}'\ndef response1 = httpRequest contentType: 'APPLICATION_JSON',httpMode: 'POST',url: 'http://10.51.30.77:8001/application/v1/flowJob/notification',requestBody:reqBody\nprintln response1.status \nprintln response1.content\n}catch (Exception e) {\nprintln e.message\n}"
+            },
+            "key": "scriptBlock"
+          }]
+        }]
+      }
+    }]
+  },
+  "options": {
+    "options": [{
+      "name": "timeout",
+      "arguments": [{
+        "isLiteral": true,
+        "value": 1
+      }]
+    }]
+  },
+  "stages": [{
+    "agent": {
+      "arguments": [{
+        "value": {
+          "isLiteral": true,
+          "value": "f4defb32-e2ba-40b9-b911-31776c87192e"
+        },
+        "key": "cloud"
+      }, {
+        "value": {
+          "isLiteral": false,
+          "value": "${never()}"
+        },
+        "key": "podRetention"
+      }, {
+        "value": {
+          "isLiteral": false,
+          "value": "${hostPathWorkspaceVolume('/root/application/sharing/a3a1bb8ee05e4946a9c09180afb254cf')}"
+        },
+        "key": "workspaceVolume"
+      }, {
+        "value": {
+          "isLiteral": true,
+          "value": "metadata:\n  namespace: applicaton-jenkins-f4defb32-e2ba-40b9-b911-31776c87192e\napiVersion: v1\nkind: Pod\nspec:\n  nodeName: node1\n  serviceAccountName: sa-pull\n  containers:\n  - image: registry.hy/library/application-component-image/jenkins-inbound-agent:amd64-4.3\n    name: jnlp\n  - image: registry.hy/apppubrepo-60b3c2dea9c0/git-github@sha256:7079ef637f9fc465deb0cd06fefc70e10d8f422ff684c1b604904bb4dbf5baf6\n    imagePullPolicy: IfNotPresent\n    name: github\n    tty: true\n    resources:\n      limits:\n        memory: 256Mi\n        ephemeral-storage: 5Gi\n        cpu: 100m\n  - image: registry.hy/library/application-component-image/git:amd64-v1.0\n    name: applicationgitpull\n    tty: true\n    resources:\n      limits:\n        memory: 500Mi\n        ephemeral-storage: 1Gi\n        cpu: 500m\n    securityContext:\n      runAsUser: 0\n"
+        },
+        "key": "yaml"
+      }],
+      "type": "kubernetes"
+    },
+    "name": "keyccc66906b9a3cf9606910f48a1a38885$aaf7d15904a34fa989bdb0cbc7072fd7",
+    "branches": [{
+      "name": "default",
+      "steps": [{
+        "children": [{
+          "name": "checkout",
+          "arguments": {
+            "isLiteral": false,
+            "value": "keyccc66906b9a3cf9606910f48a1a38885$efdb6d50e84a45c29aebb29894b72bbd"
+          }
+        }],
+        "name": "container",
+        "arguments": {
+          "isLiteral": true,
+          "value": "applicationgitpull"
+        }
+      }]
+    }]
+  }, {
+    "agent": {
+      "arguments": [{
+        "value": {
+          "isLiteral": true,
+          "value": "f4defb32-e2ba-40b9-b911-31776c87192e"
+        },
+        "key": "cloud"
+      }, {
+        "value": {
+          "isLiteral": false,
+          "value": "${never()}"
+        },
+        "key": "podRetention"
+      }, {
+        "value": {
+          "isLiteral": false,
+          "value": "${hostPathWorkspaceVolume('/root/application/sharing/a3a1bb8ee05e4946a9c09180afb254cf')}"
+        },
+        "key": "workspaceVolume"
+      }, {
+        "value": {
+          "isLiteral": true,
+          "value": "metadata:\n  namespace: applicaton-jenkins-f4defb32-e2ba-40b9-b911-31776c87192e\napiVersion: v1\nkind: Pod\nspec:\n  nodeName: node1\n  serviceAccountName: sa-pull\n  containers:\n  - image: registry.hy/library/application-component-image/jenkins-inbound-agent:amd64-4.3\n    name: jnlp\n  - image: registry.hy/apppubrepo-60b3c2dea9c0/git-github@sha256:7079ef637f9fc465deb0cd06fefc70e10d8f422ff684c1b604904bb4dbf5baf6\n    imagePullPolicy: IfNotPresent\n    name: github\n    tty: true\n    resources:\n      limits:\n        memory: 256Mi\n        ephemeral-storage: 5Gi\n        cpu: 100m\n"
+        },
+        "key": "yaml"
+      }],
+      "type": "kubernetes"
+    },
+    "name": "key431c252ff0668b9605c604ef34056ad3$db7beebe9606483295bda367deb8a1f3",
+    "branches": [{
+      "name": "default",
+      "steps": [{
+        "children": [{
+          "name": "replace",
+          "arguments": {
+            "isLiteral": false,
+            "value": "key431c252ff0668b9605c604ef34056ad3$96f89af39363426a9944da80619b85f6"
+          }
+        }],
+        "name": "container",
+        "arguments": {
+          "isLiteral": true,
+          "value": "github"
+        }
+      }]
+    }]
+  }]
+}

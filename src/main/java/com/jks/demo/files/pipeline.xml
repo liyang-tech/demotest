@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow-definition plugin="workflow-job@2.32">
+    <description>测试项目</description>
+    <definition
+        class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.66">
+        <script>pipeline {
+  agent any
+  stages {
+    stage('检出_keyccc66906b9a3cf9606910f48a1a38885') {
+      agent {
+        kubernetes {
+          cloud 'f4defb32-e2ba-40b9-b911-31776c87192e'
+          podRetention never()
+          workspaceVolume hostPathWorkspaceVolume('/root/application/sharing/a3a1bb8ee05e4946a9c09180afb254cf')
+          yaml '''metadata:
+  namespace: applicaton-jenkins-f4defb32-e2ba-40b9-b911-31776c87192e
+apiVersion: v1
+kind: Pod
+spec:
+  nodeName: node2
+  serviceAccountName: sa-pull
+  containers:
+  - image: registry.hy/library/application-component-image/jenkins-inbound-agent:amd64-4.3
+    name: jnlp
+  - image: registry.hy/apppubrepo-60b3c2dea9c0/git-github@sha256:7079ef637f9fc465deb0cd06fefc70e10d8f422ff684c1b604904bb4dbf5baf6
+    imagePullPolicy: IfNotPresent
+    name: github
+    tty: true
+    resources:
+      limits:
+        memory: 256Mi
+        ephemeral-storage: 5Gi
+        cpu: 100m
+  - image: registry.hy/library/application-component-image/git:amd64-v1.0
+    name: applicationgitpull
+    tty: true
+    resources:
+      limits:
+        memory: 500Mi
+        ephemeral-storage: 1Gi
+        cpu: 500m
+    securityContext:
+      runAsUser: 0
+'''
+        }
+
+      }
+      steps {
+        container('applicationgitpull') {
+          checkout ([$class: 'GitSCM', branches: [[name: 'master']],userRemoteConfigs: [[credentialsId: '4e7daa5fbfca48bca15cbf82b79f6522',url: 'http://data04.com/wzhonMac/demo.git']]])
+        }
+
+      }
+    }
+
+    stage('maven_key431c252ff0668b9605c604ef34056ad3') {
+      agent {
+        kubernetes {
+          cloud 'f4defb32-e2ba-40b9-b911-31776c87192e'
+          podRetention never()
+          workspaceVolume hostPathWorkspaceVolume('/root/application/sharing/a3a1bb8ee05e4946a9c09180afb254cf')
+          yaml '''metadata:
+  namespace: applicaton-jenkins-f4defb32-e2ba-40b9-b911-31776c87192e
+apiVersion: v1
+kind: Pod
+spec:
+  nodeName: node2
+  serviceAccountName: sa-pull
+  containers:
+  - image: registry.hy/library/application-component-image/jenkins-inbound-agent:amd64-4.3
+    name: jnlp
+  - image: registry.hy/apppubrepo-60b3c2dea9c0/git-github@sha256:7079ef637f9fc465deb0cd06fefc70e10d8f422ff684c1b604904bb4dbf5baf6
+    imagePullPolicy: IfNotPresent
+    name: github
+    tty: true
+    resources:
+      limits:
+        memory: 256Mi
+        ephemeral-storage: 5Gi
+        cpu: 100m
+'''
+        }
+
+      }
+      steps {
+        container('github') {
+          mvn clean package -Dmaven.test.skip=true
+        }
+
+      }
+    }
+
+  }
+  post {
+    success {
+      script {
+        try {
+          reqBody='{"flowJobId":"a3a1bb8ee05e4946a9c09180afb254cf","id":"'+"${env.BUILD_ID}"+'","flowJobTaskState":"SUCCESS"}'
+          def response1 = httpRequest contentType: 'APPLICATION_JSON',httpMode: 'POST',url: 'http://10.51.30.77:8001/application/v1/flowJob/notification',requestBody:reqBody
+          println response1.status
+          println response1.content
+        }catch (Exception e) {
+          println e.message
+        }
+      }
+
+    }
+
+    failure {
+      script {
+        try {
+          reqBody='{"flowJobId":"a3a1bb8ee05e4946a9c09180afb254cf","id":"'+"${env.BUILD_ID}"+'","flowJobTaskState":"FAILURE"}'
+          def response1 = httpRequest contentType: 'APPLICATION_JSON',httpMode: 'POST',url: 'http://10.51.30.77:8001/application/v1/flowJob/notification',requestBody:reqBody
+          println response1.status
+          println response1.content
+        }catch (Exception e) {
+          println e.message
+        }
+      }
+
+    }
+
+    aborted {
+      script {
+        try {
+          reqBody='{"flowJobId":"a3a1bb8ee05e4946a9c09180afb254cf","id":"'+"${env.BUILD_ID}"+'","flowJobTaskState":"ABORTED"}'
+          def response1 = httpRequest contentType: 'APPLICATION_JSON',httpMode: 'POST',url: 'http://10.51.30.77:8001/application/v1/flowJob/notification',requestBody:reqBody
+          println response1.status
+          println response1.content
+        }catch (Exception e) {
+          println e.message
+        }
+      }
+
+    }
+
+  }
+  options {
+    timeout(1)
+  }
+}</script>
+        <sandbox>true</sandbox>
+    </definition>
+    <properties>
+        <hudson.model.ParametersDefinitionProperty>
+            <parameterDefinitions>
+                <hudson.model.StringParameterDefinition>
+                    <name>task$id$info</name>
+                    <trim>false</trim>
+                </hudson.model.StringParameterDefinition>
+            </parameterDefinitions>
+        </hudson.model.ParametersDefinitionProperty>
+    </properties>
+</flow-definition>
+
